@@ -49,7 +49,7 @@ class V5HybridMLTests(unittest.TestCase):
                 self.assertIn(kept, csv_text)
 
             # Bare prose note: unseen English & Hindi bare names & addresses redacted via Linear-Chain CRF!
-            for leaked in ("Raghav Chauhan", "Kalpana Bisht", "सुरेश रावत", "House 41, Azad Nagar", "मकान 45, आजाद नगर"):
+            for leaked in ("Raghav Chauhan", "Kalpana Bisht", "सुरेश रावत", "House 41, Azad Nagar", "मकान 45, आजाद नगर", "Mahmudabad"):
                 self.assertNotIn(leaked, note_text)
             # Clinical eponyms, doctors, vitals, drugs, wards preserved 100%!
             for kept in ("Parkinson's disease (G20)", "Dr. Tushar Rathore", "Medical Ward 4B",

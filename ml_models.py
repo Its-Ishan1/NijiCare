@@ -427,6 +427,16 @@ class LinearChainCRF:
             mean_prob = sum(span_probs) / len(span_probs)
             start_char = spans[i][1]
             end_char = spans[j - 1][2]
+            if kind == "ADDRESS":
+                # CRF tokenization can stop at a comma inside a compound address,
+                # leaving the locality (for example, "Near Grain Mandi, Mahmudabad")
+                # visible. Absorb a short title-cased locality suffix after that comma.
+                suffix = re.match(
+                    r",\s+([A-Z][A-Za-z'’\-]*(?:\s+[A-Z][A-Za-z'’\-]*){0,2})(?=[.,;:]|\s|$)",
+                    text[end_char:],
+                )
+                if suffix and not suffix.group(1).casefold().startswith(("dr ", "dr.")):
+                    end_char += suffix.end(1)
             raw_span = text[start_char:end_char]
             low_span = raw_span.casefold().strip()
 
