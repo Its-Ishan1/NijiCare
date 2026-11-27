@@ -251,6 +251,10 @@ def canonical_person_name(name: str) -> str:
             # Collapse common vowel/double-letter spelling variations (ee->i, oo->u, aa->a, w->v, ph->f)
             s = t.replace("ph", "f").replace("w", "v").replace("ee", "i").replace("oo", "u").replace("aa", "a")
             s = re.sub(r"(.)\1+", r"\1", s)
+            # Common English spellings and Devanagari transliteration of
+            # अय्यर are equivalent in this surname (Iyer/Ayyar/Ayar).
+            if s in {"iyar", "ayar", "aiyar"}:
+                s = "iyer"
             cleaned.append(s)
     return " ".join(cleaned)
 
@@ -300,10 +304,15 @@ def private_label(value: str) -> str:
 # --------------------------------------------------------------------------- detection
 _D = r"[0-9\u0966-\u096f]"
 _D69 = r"[6-9\u096c-\u096f]"
+_PHONE_SEP = r"[\s().-]*"
+PHONE_PATTERN = re.compile(
+    rf"(?<!{_D})(?:(?:\+|00)?(?:91|९१){_PHONE_SEP})?"
+    rf"0?{_D69}{_D}{{4}}(?:{_PHONE_SEP}{_D}){{5}}(?!{_D})"
+)
 PATTERNS = [
     ("ABHA", re.compile(rf"(?<!{_D}){_D}{{2}}[- ]?{_D}{{4}}[- ]?{_D}{{4}}[- ]?{_D}{{4}}(?!{_D})")),
     ("AADHAAR_MASKED", re.compile(rf"(?i)(?<![A-Za-z0-9])(?:x{{4}}|[*X]{{4}})[\s-]?(?:x{{4}}|[*X]{{4}})[\s-]?{_D}{{4}}(?!{_D})")),
-    ("PHONE", re.compile(rf"(?<!{_D})(?:\+?(?:91|९१)[\s-]?)?{_D69}{_D}{{4}}[\s-]?{_D}{{5}}(?!{_D})")),
+    ("PHONE", PHONE_PATTERN),
     ("AADHAAR", re.compile(rf"(?<!{_D})(?<![0-9a-fA-F]{{4}}-){_D}{{4}}[\s-]?{_D}{{4}}[\s-]?{_D}{{4}}(?!{_D})")),
     ("EMAIL", re.compile(r"[\w.+-]+@[\w-]+\.[\w.]+")),
     ("PAN", re.compile(r"\b[A-Z]{5}\d{4}[A-Z]\b")),
@@ -347,7 +356,11 @@ CONTACT_NAME = re.compile(
     re.MULTILINE,
 )
 VISITOR_NAME = re.compile(rf"(?m)^(?P<prefix>\d{{1,2}}:\d{{2}}[ \t]+-[ \t]+){PERSON_NAME}(?=[ \t]*\((?:attendant|visitor|relative)\b)")
-RELATIVE_NAME = re.compile(r"(?im)(?P<prefix>(?:^|[(,])[ \t]*[sdw]/o[ \t]+)[^),\r\n;|]+")
+RELATIVE_NAME = re.compile(
+    rf"(?i)(?P<prefix>\b[sdw]/o[ \t]*[:：]?[ \t]*)"
+    rf"(?P<name>{_TEXT_PERSON_WORD}(?:[ \t]+{_TEXT_PERSON_WORD}){{0,3}})"
+    rf"(?=$|[,;)|\r\n.!?]|[ \t]+(?:BP|Hb|SpO2|Temp(?:erature)?|Pulse|Diagnosis|C/O|K/C/O|Rx|admitted|discharged)\b)"
+)
 CHAT_SENDER = re.compile(
     r"(?im)^(?P<prefix>\[\d{1,2}[/.-]\d{1,2}[/.-]\d{2,4},[ \t]+\d{1,2}:\d{2}[^\]\r\n]*\][ \t]+)"
     r"(?!Dr\.?[ \t])[^:\r\n]+(?=:[ \t])"
@@ -368,14 +381,14 @@ TIMED_PATIENT = re.compile(
     rf"(?m)^(?P<prefix>\d{{1,2}}:\d{{2}}[ \t]+[-–][ \t]+)(?!(?i:dr\.?|doctor)\b)"
     rf"{PERSON_NAME}(?=[ \t]+[-–][ \t]+(?i:k/c/o|h/o|c/o)\b)"
 )
-CONTEXT_PATTERNS = (CONTACT_NAME, VISITOR_NAME, RELATIVE_NAME, CHAT_SENDER, HONORIFIC_NAME,
+CONTEXT_PATTERNS = (CONTACT_NAME, VISITOR_NAME, CHAT_SENDER, HONORIFIC_NAME,
                     RELATIVE_CLAUSE, POSSESSIVE_NAME, VITAL_SUBJECT, TIMED_PATIENT)
 
 FIELD_LABELS = {
     "NAME": "patient name|patient's name|patient full name|full patient name|name of patient|patient legal name|first name|last name|given name|family name|surname|patient|naam|naame|naem|नाम|मरीज़ का नाम|मरीज का नाम|रोगी का नाम|client name|subject name|beneficiary name",
     "RELATIVE": "relative name|guardian|guardian name|attendant|attendant name|next of kin|nok|care of|father name|mother name|spouse name|husband name|pita/pati ka naam|पिता का नाम|पति का नाम|अभिभावक",
-    "MRN": "patient id|patient ref|mrn|uhid|uhid no|hospital uhid|registration no|reg no|chart id|chart number|medical record number|medical record id|record id|record identifier|local id|hospital number|registration number|patient identifier|hospital id|case no|case id|file no|पंजीकरण सं.|पंजीकरण संख्या|पंजीकरण नंबर|पंजीयन संख्या",
-    "ENCOUNTER": "ipd no|opd no|ip no|op no|admission id|encounter id|visit id|आईपीडी सं.",
+    "MRN": "patient id|patient ref|mrn|uhid|uhid no|hospital uhid|registration no|reg no|chart id|chart number|medical record number|medical record id|record identifier|local id|hospital number|registration number|patient identifier|hospital id|case no|case id|file no|पंजीकरण सं.|पंजीकरण संख्या|पंजीकरण नंबर|पंजीयन संख्या",
+    "ENCOUNTER": "record id|record no|ipd no|opd no|ip no|op no|admission id|encounter id|visit id|आईपीडी सं.",
     "PHONE": "phone|phone no|phone number|telephone|tel|contact|contact no|contact number|callback|mobile|mobile number|mobile no|mob|cell|whatsapp|मोबाइल|मोबाइल नं.|फ़ोन|फोन",
     "EMAIL": "email|email address|e-mail|mail|abha address",
     "NATIONAL_ID": "aadhaar|aadhar|aadhaar no|aadhar no|abha|abha no|abha id|health id|national id|gov id|govt id|आधार|आभा",
@@ -1010,6 +1023,9 @@ def redact_plain(text: str) -> str:
         text = DYNAMIC_NOTE_FIELD.sub(redact_dynamic_note_field, text)
     text = redact_care_of_relative(text)
     if (" " in text or "\t" in text) and _category_enabled("NAME"):
+        if _category_enabled("RELATIVE"):
+            text, n = RELATIVE_NAME.subn(r"\g<prefix>[RELATIVE]", text)
+            Stats.record_entity("RELATIVE", n)
         for pattern in CONTEXT_PATTERNS:
             text, n = pattern.subn(r"\g<prefix>[NAME]", text)
             Stats.record_entity("NAME", n)
@@ -1040,7 +1056,9 @@ def sensitive_label(label: str) -> bool:
     if not HASH_FILENAMES_ENABLED:
         return False
     probe = readable(label)
-    return bool(ID_TOKEN.search(probe.upper())) or clean_text(label) != label
+    return bool(ID_TOKEN.search(probe.upper())) or clean_text(label) != label or bool(
+        re.search(r"(?<!\d)\d{10,18}(?!\d)", ascii_digits(probe))
+    )
 
 
 def sensitive_filename(label: str) -> bool:
@@ -1088,7 +1106,7 @@ def clean_value(value, kind=None, *, context="", date_key=None, records_by_id=No
                 child_kind = kind if whole_name else nested.get(label) or resolve_field_kind(key)
             if context == "byname" and isinstance(item, str) and identity_id(item):
                 child_kind = "MRN"
-            new_key = private_label(key) if (HASH_FILENAMES_ENABLED and (context in PRIVATE_MAPS or sensitive_label(key))) else key
+            new_key = private_label(key) if (HASH_FILENAMES_ENABLED and (context in PRIVATE_MAPS or sensitive_filename(key))) else key
             if new_key in cleaned:
                 raise ValueError("key_collision")
             if (attachment and label in ATTACHMENT_FIELDS or label in {"base64", "contentbase64", "database64", "attachmentbase64"}) and isinstance(item, str):
@@ -1127,16 +1145,18 @@ def clean_value(value, kind=None, *, context="", date_key=None, records_by_id=No
 
 
 # --------------------------------------------------------------------------- linkage
-IDENTITY_CONTEXT = {"patient", "patientref", "patientdetails", "contact", "ids", "demographics", "identifiers"}
+IDENTITY_CONTEXT = {"patient", "patientref", "patientdetails", "patientidentifiers", "patientidentification", "contact", "ids", "demographics", "identifiers"}
 IDENTITY_KINDS = {"MRN", "ENCOUNTER", "NAME", "RELATIVE", "PHONE", "DOB", "NATIONAL_ID", "EMAIL", "ADDRESS"}
 VILLAGE_LABELS = {field_label(k) for k in ("village", "gaon", "ग्राम", "village/mohalla", "gram/mohalla")}
 CALLBACK = re.compile(r"(?i)\b(?:call(?:\s+(?:karo|back|at|on))?|mobile|phone)\s*[:=-]?\s*"
-                      r"(?P<number>(?:\+?(?:91|९१)[ -]?)?[6-9६-९]\d{4}[ -]?\d{5})(?!\d)")
+                      r"(?P<number>(?:(?:\+|00)?(?:91|९१)[\s().-]*)?0?[6-9६-९][\s().-]*\d{4}(?:[\s().-]*\d){5})(?!\d)")
 REPORT_SUBJECT = re.compile(r"(?i)\breport\s+(?:of|for)\s+([^\W\d_]+)")
 
 
 def identity_id(value: str) -> str | None:
     token = re.sub(r"[\s_./-]", "", ascii_digits(value)).upper()
+    if re.fullmatch(r"\d{7,18}", token):
+        return token
     if re.fullmatch(r"[A-Z][A-Z0-9]{3,47}", token) and sum(c.isdigit() for c in token) >= 2:
         return token
     return None
@@ -1163,6 +1183,10 @@ def identity_fields(record, depth=0, context=""):
         for raw_label, value in record.items():
             label = field_label(raw_label)
             kind = NESTED_FIELDS.get(context, {}).get(label) or resolve_field_kind(raw_label)
+            if isinstance(value, str):
+                for match in FRAGMENTED_RELATION.finditer(readable(value)):
+                    yield "patient name", "NAME", match["patient"].strip()
+                    yield "relative name", "RELATIVE", match["relative"].strip()
             if label in IDENTITY_CONTEXT and isinstance(value, dict):
                 yield from identity_fields(value, depth + 1, label)
             elif label == "name" and isinstance(value, dict):
@@ -1199,10 +1223,23 @@ def demographic_fields(record, depth=0):
 def evidence(record, month_first=False):
     fields = defaultdict(set)
     names = {}
+    def scan_phone_values(value):
+        if isinstance(value, str):
+            probe = readable(value)
+            for match in PHONE_PATTERN.finditer(probe):
+                digits = re.sub(r"\D", "", ascii_digits(match[0]))
+                if len(digits) >= 10:
+                    fields["PHONE"].add(digits[-10:])
+        elif isinstance(value, dict):
+            for child in value.values():
+                scan_phone_values(child)
+        elif isinstance(value, list):
+            for child in value:
+                scan_phone_values(child)
+
+    scan_phone_values(record)
     if isinstance(record, str):
         record = readable(record)
-        fields["PHONE"].update(re.sub(r"\D", "", ascii_digits(m["number"]))[-10:]
-                               for m in CALLBACK.finditer(record))
         fields["GIVEN"].update(canonical_person_name(m[1]) for m in REPORT_SUBJECT.finditer(record))
         for pattern in (TEXT_NOTE_SUBJECT, TEXT_LEADING_CONTACT):
             for match in pattern.finditer(record):
@@ -1352,13 +1389,33 @@ class IdentityIndex:
         VOCAB.chart_ids.update(fields["MRN"])
         for relative in fields["RELATIVE"]:
             VOCAB.add_relative(relative)
-        if any(fields[kind] for kind in ("MRN", "DOB", "PHONE", "NATIONAL_ID")):
+        if fields["MRN"] and any(fields[kind] for kind in ("NAME", "DOB", "PHONE", "NATIONAL_ID")):
             for name in fields["NAME"]:
                 VOCAB.add(name)
-        if len(fields["MRN"]) != 1:
+        if not fields["MRN"]:
             return
-        mrn = next(iter(fields["MRN"]))
+        # Multiple patient identifiers in one record are aliases for that
+        # record's person (e.g. a local UHID plus a longitudinal MRN). Index
+        # them under one deterministic root; conflicting records still abstain
+        # later when their demographics or national identifiers disagree.
+        keys = sorted(fields["MRN"])
+        for key in keys:
+            self.roots.setdefault(key, key)
+        roots = {self.root(key) for key in keys}
+        mrn = min(roots)
+        for root in roots:
+            if root == mrn:
+                continue
+            self.roots[root] = mrn
+            self.birth_dates[mrn].update(self.birth_dates[root])
+            self.phones_by_mrn[mrn].update(self.phones_by_mrn[root])
+            self.ages_by_mrn[mrn].update(self.ages_by_mrn[root])
+            self.areas_by_mrn[mrn].update(self.areas_by_mrn[root])
+            for size, values in self.national_ids[root].items():
+                self.national_ids[mrn][size].update(values)
         self.roots[mrn] = mrn
+        for key in keys:
+            self.roots[key] = mrn
         self.birth_dates[mrn].update(fields["DOB"])
         self.phones_by_mrn[mrn].update(fields["PHONE"])
         for national in fields["NATIONAL_ID"]:
@@ -1443,8 +1500,6 @@ class IdentityIndex:
         return f"{best[0]}-{best[1]}" if best is not None else age_band(age)
 
     def resolve(self, record, fields):
-        if len(fields["MRN"]) > 1:
-            return None
         candidates = set(fields["MRN"])
         if not candidates:
             for encounter in fields["ENCOUNTER"]:
@@ -1855,7 +1910,7 @@ def add_record(records, rel, loc, pid, generalized=False):
 def safe_json_locator(path):
     parts = []
     for part in path:
-        if isinstance(part, str) and sensitive_label(part):
+        if isinstance(part, str) and sensitive_filename(part):
             part = private_label(part)
         parts.append(str(part).replace("~", "~0").replace("/", "~1"))
     return "".join("/" + part for part in parts) or "doc"
@@ -1874,7 +1929,7 @@ def process_csv(rows, delimiter: str, rel: str, records: list, index, month_firs
             kinds = ["ADDRESS" if label == "city" and label not in EXTRA_PRESERVE_FIELDS else kind for label, kind in zip(labels, kinds)]
     buf = io.StringIO()
     w = csv.writer(buf, delimiter=delimiter, lineterminator="\n")
-    w.writerow([private_label(column) if sensitive_label(column) else column for column in header])
+    w.writerow([private_label(column) if sensitive_filename(column) else column for column in header])
     pid_column = next((i for i, kind in enumerate(kinds) if kind in ("MRN", "NAME", "ENCOUNTER")), None)
     for i, row in enumerate(rows[1:]):
         original = dict(zip(semantic_header, row))
@@ -1905,17 +1960,21 @@ def process_csv(rows, delimiter: str, rel: str, records: list, index, month_firs
 
 def insert_pseudonym(cleaned, pid):
     """Reuse a string identity field to preserve the input record's shape."""
-    slots = [cleaned]
-    for label, value in cleaned.items():
-        if field_label(label) in IDENTITY_CONTEXT and isinstance(value, dict):
-            slots.append(value)
-    for slot in slots:
-        for wanted in ("MRN", "NAME"):
-            for label, value in slot.items():
-                if value == f"[{wanted}]":
-                    slot[label] = pid
+    def insert(value):
+        if isinstance(value, dict):
+            for label, child in value.items():
+                if child == "[MRN]" or child == "[NAME]":
+                    value[label] = pid
                     return True
-    return False
+                if insert(child):
+                    return True
+        elif isinstance(value, list):
+            for child in value:
+                if insert(child):
+                    return True
+        return False
+
+    return insert(cleaned)
 
 
 def clean_json_record(data, rel, loc, records, index, name_hint=None):
