@@ -11,7 +11,7 @@ export function ErrorBanner({
   message,
   requestId,
   onRetry,
-  retryLabel = 'Retry run',
+  retryLabel = 'Retry demo run',
 }: ErrorBannerProps) {
   return (
     <div className="error-banner" role="alert">

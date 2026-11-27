@@ -6,6 +6,8 @@ export type PageId =
   | 'quarantine'
   | 'audit';
 
+export type InputTabId = 'upload' | 'paste' | 'builder' | 'preset';
+
 export interface PolicyConfig {
   age_band_years: number;
   age_band_max_years: number;

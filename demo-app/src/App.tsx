@@ -11,6 +11,7 @@ import {
   type HealthResponse,
   type PageId,
   type PolicyConfig,
+  type PresetInfo,
   type RunRequestPayload,
   type SecretMode,
 } from './types';
@@ -21,8 +22,9 @@ const FileViewer = lazy(() => import('./pages/FileViewer').then(m => ({ default:
 const PrivacyAudit = lazy(() => import('./pages/PrivacyAudit').then(m => ({ default: m.PrivacyAudit })));
 
 export default function App() {
-  const [page, setPage] = useState<PageId>('run');
+  const [page, setPage] = useState<PageId>('overview');
   const [demoConfigured, setDemoConfigured] = useState<boolean | null>(null);
+  const [presets, setPresets] = useState<PresetInfo[]>([]);
   const [defaultPolicy, setDefaultPolicy] = useState<PolicyConfig>(DEFAULT_POLICY);
   const [policy, setPolicy] = useState<PolicyConfig>(DEFAULT_POLICY);
   const [secretMode, setSecretMode] = useState<SecretMode>('default');
@@ -44,7 +46,8 @@ export default function App() {
   useEffect(() => {
     apiGet<HealthResponse>('/api/health')
       .then((h) => {
-        setDemoConfigured(h.pipeline_available);
+        setDemoConfigured(h.demo_configured);
+        if (h.presets) setPresets(h.presets);
         if (h.default_policy) {
           setDefaultPolicy(h.default_policy);
           setPolicy(h.default_policy);
@@ -89,8 +92,11 @@ export default function App() {
 
         {page === 'overview' && (
           <Overview
+            presets={presets}
             onNavigate={setPage}
             demoConfigured={demoConfigured}
+            onQuickRun={handleStartRun}
+            isStarting={isStarting}
           />
         )}
 
@@ -98,6 +104,7 @@ export default function App() {
           <RunScreen
             runDetail={runDetail}
             history={history}
+            presets={presets}
             policy={policy}
             defaultPolicy={defaultPolicy}
             onPolicyChange={setPolicy}
@@ -139,7 +146,7 @@ export default function App() {
       <footer className="app-footer">
         <div className="app-footer-inner">
           <span>
-            <strong>Secret Wards v5 · Hybrid Rules + ML</strong> — Offline hospital research data privacy firewall ·
+            <strong>Secret Wards · Hybrid Rules + ML</strong> — Offline hospital research data privacy firewall ·
             Yugaantar DevForge Track 3
           </span>
           <span>

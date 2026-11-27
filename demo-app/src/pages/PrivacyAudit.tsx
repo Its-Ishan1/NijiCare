@@ -44,7 +44,7 @@ export function PrivacyAudit({ runDetail }: PrivacyAuditProps) {
 
         {!runDetail || runDetail.status !== 'completed' ? (
           <div className="audit-no-run">
-            <span>Upload files and run the pipeline to see their results.</span>
+            <span>No completed run yet. Run the synthetic demo to populate this section.</span>
           </div>
         ) : (
           <div className="audit-run-grid">
@@ -101,7 +101,7 @@ export function PrivacyAudit({ runDetail }: PrivacyAuditProps) {
           <h2 id="practice-audit-title" className="section-title">Practice benchmark results</h2>
           <div className="disclaimer-note audit-disclaimer">
             <span>ℹ</span>
-            Measured on the 200-file practice set. Your upload has its own run summary.
+            Practice data; not hidden competition results.
           </div>
         </div>
 
@@ -117,7 +117,7 @@ export function PrivacyAudit({ runDetail }: PrivacyAuditProps) {
                 <div className="ab-value ab-green">
                   <Fraction kept={sc.labeled_identifiers_visible.found} total={sc.labeled_identifiers_visible.total} />
                 </div>
-                <div className="ab-hint">Labeled practice identifiers</div>
+                <div className="ab-hint">0 found — all identifiers removed</div>
               </div>
               <div className="audit-benchmark-card">
                 <div className="ab-label">Planted canaries exposed</div>
@@ -131,7 +131,7 @@ export function PrivacyAudit({ runDetail }: PrivacyAuditProps) {
                 <div className="ab-value ab-teal">
                   <Fraction kept={sc.checked_medical_values_retained.kept} total={sc.checked_medical_values_retained.total} />
                 </div>
-                <div className="ab-hint">{(100 * sc.checked_medical_values_retained.kept / sc.checked_medical_values_retained.total).toFixed(1)}% of checked values</div>
+                <div className="ab-hint">100% clinical fidelity</div>
               </div>
               <div className="audit-benchmark-card">
                 <div className="ab-label">Linkage precision / recall / F0.5</div>

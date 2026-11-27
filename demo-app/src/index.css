@@ -5,28 +5,28 @@
 
 :root {
   /* ── Background layers ── */
-  --bg-primary:    #F7F8FA;        /* cool near-white page canvas */
-  --bg-secondary:  #EEF0F4;        /* section backgrounds */
+  --bg-primary:    #F4F7F5;        /* soft sage-white page canvas */
+  --bg-secondary:  #EAF0EC;        /* section backgrounds */
   --bg-card:       #FFFFFF;        /* card surfaces */
   --bg-code:       #F1F3F7;        /* code blocks */
 
   /* ── Foreground ── */
-  --text-primary:   #1B2A4A;       /* deep navy — headings, primary text */
-  --text-secondary: #4A5568;       /* body text */
-  --text-muted:     #718096;       /* captions, helper text */
+  --text-primary:   #1C3440;       /* deep clinical blue-green */
+  --text-secondary: #4E6265;       /* body text */
+  --text-muted:     #738487;       /* captions, helper text */
   --text-inverse:   #FFFFFF;       /* text on dark surfaces */
 
   /* ── Borders ── */
-  --border-subtle: #DDE1E9;
-  --border-strong: #BFC8D6;
+  --border-subtle: #DCE5DF;
+  --border-strong: #BCCBC2;
 
   /* ── Teal — primary brand, actions, success ── */
-  --accent-teal:        #0D9488;
-  --accent-teal-dark:   #0A7A6E;
-  --accent-teal-hover:  #0B7E73;
-  --accent-teal-light:  #CCFBF1;
-  --accent-teal-xlight: #E6FAF7;
-  --accent-teal-text:   #0F5E57;
+  --accent-teal:        #128A78;
+  --accent-teal-dark:   #0D6D61;
+  --accent-teal-hover:  #0E786A;
+  --accent-teal-light:  #D9F0E7;
+  --accent-teal-xlight: #EDF8F2;
+  --accent-teal-text:   #155C53;
 
   /* ── Saffron — highlight, secondary badge ── */
   --accent-saffron:       #C4841D;
@@ -34,8 +34,8 @@
   --accent-saffron-text:  #7A500A;
 
   /* ── Navy — dark surface, utility bar ── */
-  --accent-navy:       #1B2A4A;
-  --accent-navy-light: #EEF1F7;
+  --accent-navy:       #1C3440;
+  --accent-navy-light: #EAF0EC;
 
   /* ── Semantic states ── */
   --error:          #DC2626;
@@ -72,9 +72,9 @@
 
   /* ── Shadows ── */
   --shadow-xs:   0 1px 2px rgba(27, 42, 74, 0.04);
-  --shadow-card: 0 1px 3px rgba(27, 42, 74, 0.06), 0 6px 16px rgba(27, 42, 74, 0.04);
-  --shadow-pop:  0 4px 24px rgba(27, 42, 74, 0.10);
-  --shadow-teal: 0 4px 14px rgba(13, 148, 136, 0.22);
+  --shadow-card: 0 1px 3px rgba(28, 52, 64, 0.055), 0 8px 24px rgba(28, 52, 64, 0.045);
+  --shadow-pop:  0 8px 28px rgba(28, 52, 64, 0.12);
+  --shadow-teal: 0 5px 16px rgba(18, 138, 120, 0.2);
 
   /* ── Transitions ── */
   --transition-fast: 120ms ease;
@@ -97,7 +97,7 @@ html {
 
 body {
   margin: 0;
-  background-color: var(--bg-primary);
+  background: radial-gradient(ellipse at 8% 0%, rgba(220, 239, 229, .24), transparent 34rem), var(--bg-primary);
   color: var(--text-primary);
   font-family: var(--font-sans);
   font-size: 0.9375rem;
@@ -153,7 +153,7 @@ a, button {
    ============================================================ */
 .page-container {
   flex: 1;
-  max-width: 1200px;
+  max-width: 1320px;
   width: 100%;
   margin: 0 auto;
   padding: var(--space-8) var(--space-6);
@@ -328,7 +328,7 @@ a, button {
 }
 
 .app-footer-inner {
-  max-width: 1200px;
+  max-width: 1320px;
   margin: 0 auto;
   padding: var(--space-5) var(--space-6);
   display: flex;
