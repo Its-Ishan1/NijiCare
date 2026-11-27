@@ -149,60 +149,128 @@
 .stat-card.error .stat-card-value { color: var(--error-text); }
 
 /* ── Before/After Comparison ── */
-.before-after {
+.before-after-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
   gap: 1rem;
+  min-width: 0;
 }
 
-.ba-pane {
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border-subtle);
+.diff-panel {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
   overflow: hidden;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--bg-card);
 }
 
-.ba-pane-header {
+.diff-panel-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.5rem 0.9rem;
-  font-size: 0.78rem;
+  gap: 0.65rem;
+  min-width: 0;
+  padding: 0.7rem 0.9rem;
+  border-bottom: 1px solid var(--border-subtle);
+  background: var(--bg-secondary);
+}
+
+.diff-panel.is-after .diff-panel-head {
+  border-bottom-color: rgba(13, 148, 136, 0.18);
+  background: var(--accent-teal-xlight);
+}
+
+.diff-panel-title {
+  min-width: 0;
+  color: var(--text-primary);
+  font-size: 0.8rem;
   font-weight: 700;
-  letter-spacing: 0.04em;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.diff-tag {
+  flex: 0 0 auto;
+  padding: 0.2rem 0.5rem;
+  border-radius: 6px;
+  color: var(--text-secondary);
+  background: var(--bg-card);
+  font-size: 0.67rem;
+  font-weight: 700;
+  letter-spacing: 0.035em;
+  line-height: 1.2;
   text-transform: uppercase;
+  white-space: nowrap;
 }
 
-.ba-pane.ba-before .ba-pane-header {
-  background: var(--error-light);
+.diff-tag.fictional {
   color: var(--error-text);
-  border-bottom: 1px solid rgba(220, 38, 38, 0.15);
+  background: var(--error-light);
 }
 
-.ba-pane.ba-after .ba-pane-header {
-  background: var(--accent-teal-light);
+.diff-tag.sanitized {
   color: var(--accent-teal-text);
-  border-bottom: 1px solid rgba(13, 148, 136, 0.15);
+  background: var(--accent-teal-light);
 }
 
-.ba-pane-body {
-  padding: 0.9rem;
-  background: var(--bg-code);
-  overflow-x: auto;
-}
-
-.ba-pane-body pre {
+.diff-pre {
+  width: 100%;
+  min-width: 0;
+  max-height: min(62vh, 680px);
   margin: 0;
+  padding: 1rem;
+  overflow: auto;
+  background: var(--bg-code);
+  color: var(--text-primary);
   font-family: var(--font-mono);
   font-size: 0.8rem;
   line-height: 1.65;
-  color: var(--text-primary);
   white-space: pre-wrap;
-  word-break: break-word;
+  overflow-wrap: anywhere;
+  tab-size: 2;
 }
 
-@media (max-width: 640px) {
-  .before-after {
-    grid-template-columns: 1fr;
+.diff-highlights {
+  margin-top: 1rem;
+  padding: 0.25rem 0.15rem 0;
+  color: var(--text-secondary);
+}
+
+.diff-highlights h4 {
+  margin: 0 0 0.5rem;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+}
+
+.diff-highlights ul {
+  display: grid;
+  gap: 0.45rem;
+  margin: 0;
+  padding-left: 1.25rem;
+}
+
+.diff-highlights li {
+  padding-left: 0.1rem;
+  line-height: 1.55;
+}
+
+@media (max-width: 760px) {
+  .before-after-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* Put the result first on narrow screens; the source remains available below. */
+  .diff-panel.is-after {
+    order: -1;
+  }
+
+  .diff-pre {
+    max-height: 54vh;
+    padding: 0.85rem;
+    font-size: 0.76rem;
   }
 }
 
