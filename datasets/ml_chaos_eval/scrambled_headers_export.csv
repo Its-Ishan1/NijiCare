@@ -1,0 +1,5 @@
+Rec_Key,Entity_Alpha,Domicile_Text,Line_Ring,Age,District,Admit Date,Discharge Date,Clinical_Note_Rx,Attending_MD
+HYB-80101,Devika Deshpande,House 41 Azad Nagar,9811445566,38,Sitapur,2026-09-01,2026-09-06,Tab Paracetamol 650 mg 1-1-1,Dr. Vivek Kulkarni
+HYB-80102,Prakash Sengupta,Flat 108 Ashok Vihar,9822556677,41,Sitapur,2026-09-02,2026-09-08,Tab Cefixime 200 mg BD,Dr. Vivek Kulkarni
+HYB-80103,Nandini Awasthi,Village Bhawanipur Khurd Post Misrikh,9833667788,52,Hardoi,2026-09-03,2026-09-07,IV Normal Saline 100 mL/hr,Dr. Meera Gokhale
+HYB-80104,Rajendra Bhandari,Mohalla Purani Basti Tehsil Nawabganj,9844778899,55,Hardoi,2026-09-04,2026-09-10,Tab Azithromycin 500 mg OD,Dr. Meera Gokhale

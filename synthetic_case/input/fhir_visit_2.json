@@ -1,0 +1,38 @@
+{
+  "resourceType": "Bundle",
+  "id": "syn-bundle-2",
+  "type": "collection",
+  "entry": [
+    {
+      "fullUrl": "urn:uuid:22222222-2222-4333-8444-555555555551",
+      "resource": {
+        "resourceType": "Patient",
+        "id": "p-omkar",
+        "identifier": [{"value": "NW-81004"}],
+        "name": [{"text": "Omkar Negi"}],
+        "gender": "male",
+        "birthDate": "1933-01-22",
+        "address": [{"district": "Kheri", "state": "Uttar Pradesh", "country": "IN"}]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:22222222-2222-4333-8444-555555555552",
+      "resource": {
+        "resourceType": "Encounter",
+        "id": "enc-omkar",
+        "status": "finished",
+        "subject": {"reference": "urn:uuid:22222222-2222-4333-8444-555555555551", "display": "Omkar Negi"},
+        "period": {"start": "2026-10-03T10:00:00+05:30", "end": "2026-10-09T14:00:00+05:30"}
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:22222222-2222-4333-8444-555555555553",
+      "resource": {
+        "resourceType": "Condition",
+        "id": "cond-omkar",
+        "subject": {"reference": "urn:uuid:22222222-2222-4333-8444-555555555551"},
+        "code": {"coding": [{"system": "http://hl7.org/fhir/sid/icd-10", "code": "I10", "display": "Essential (primary) hypertension"}]}
+      }
+    }
+  ]
+}

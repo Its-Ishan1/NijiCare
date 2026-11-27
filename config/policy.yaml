@@ -1,0 +1,28 @@
+# Secret Wards Privacy Policy Configuration (v5 — Hybrid Rules + Statistical ML)
+# Used by main.py (offline, stdlib-only). Can be overridden per run with --policy or RAKSHA_POLICY.
+
+# Quasi-identifier generalization & temporal shifting
+age_band_years: 5
+age_band_max_years: 50
+age_k_anonymity: 2
+date_shift_max_days: 180
+
+# Feature toggles (true / false)
+shift_dates: true
+generalize_ages: true
+preserve_doctors: true
+hash_sensitive_filenames: true
+
+# Hybrid statistical ML fallback (zero-dependency stdlib Linear-Chain CRF + Column Classifier)
+ml_fallback: true
+ml_ner_threshold: 0.85
+ml_col_threshold: 0.80
+
+# Enabled PII redaction categories (comma-separated)
+redact_categories: PHONE,AADHAAR,ABHA,EMAIL,PAN,NAME,MRN,ENCOUNTER,DOB,ADDRESS,RELATIVE,INSURANCE_ID,SOURCE_PATH
+
+# Optional custom rules for unseen datasets (comma-separated)
+extra_redact_fields:
+extra_preserve_fields:
+extra_redact_terms:
+extra_redact_regex:

@@ -1,0 +1,88 @@
+{
+  "seed": 20261126,
+  "datasets": {
+    "ner_train_sequences": 4000,
+    "ner_val_sequences": 1000,
+    "col_train_columns": 3150,
+    "col_val_columns": 840,
+    "disjoint_entity_pools": true,
+    "dev_input_overlap": false
+  },
+  "deployed_stdlib_artifacts": {
+    "ner_crf": {
+      "path": "models/ner_crf.json.gz",
+      "size_kb": 19.8,
+      "features": 1609
+    },
+    "col_clf": {
+      "path": "models/col_clf.json.gz",
+      "size_kb": 30.3,
+      "features": 2113
+    }
+  },
+  "ner_benchmarks_heldout": {
+    "linear_chain_crf_deployed": {
+      "precision": 1.0,
+      "recall": 0.9743,
+      "f1": 0.987,
+      "negative_control_fp": 0,
+      "negative_control_total": 256,
+      "train_seconds": 358.35,
+      "feature_count": 1609
+    },
+    "sklearn_token_logreg": {
+      "precision": 0.997,
+      "recall": 0.953,
+      "f1": 0.9745,
+      "negative_control_fp": 0,
+      "negative_control_total": 256,
+      "train_seconds": 1.16
+    },
+    "sklearn_token_linearsvc": {
+      "precision": 0.9971,
+      "recall": 0.9729,
+      "f1": 0.9848,
+      "negative_control_fp": 0,
+      "negative_control_total": 256,
+      "train_seconds": 25.83
+    }
+  },
+  "column_classifier_benchmarks_heldout": {
+    "sklearn_col_logreg_deployed": {
+      "accuracy": 1.0,
+      "macro_precision": 1.0,
+      "macro_recall": 1.0,
+      "macro_f1": 1.0,
+      "clinical_misclassified_as_pii": 0,
+      "clinical_total": 120,
+      "train_seconds": 0.74
+    },
+    "sklearn_col_linearsvc": {
+      "accuracy": 1.0,
+      "macro_precision": 1.0,
+      "macro_recall": 1.0,
+      "macro_f1": 1.0,
+      "clinical_misclassified_as_pii": 0,
+      "clinical_total": 120,
+      "train_seconds": 0.39
+    },
+    "sklearn_col_random_forest": {
+      "accuracy": 0.9988,
+      "macro_precision": 0.9988,
+      "macro_recall": 0.9988,
+      "macro_f1": 0.9988,
+      "clinical_misclassified_as_pii": 0,
+      "clinical_total": 120,
+      "train_seconds": 0.54
+    },
+    "sklearn_col_mlp": {
+      "accuracy": 1.0,
+      "macro_precision": 1.0,
+      "macro_recall": 1.0,
+      "macro_f1": 1.0,
+      "clinical_misclassified_as_pii": 0,
+      "clinical_total": 120,
+      "train_seconds": 21.74
+    }
+  }
+}

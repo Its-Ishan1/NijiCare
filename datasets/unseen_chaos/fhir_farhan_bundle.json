@@ -1,0 +1,43 @@
+{
+  "resourceType": "Bundle",
+  "id": "bundle-farhan-2026",
+  "type": "collection",
+  "entry": [
+    {
+      "fullUrl": "urn:uuid:11111111-2222-4333-8444-555555555551",
+      "resource": {
+        "resourceType": "Patient",
+        "id": "pat-farhan-99",
+        "identifier": [{ "system": "urn:hospital:nwc", "value": "NWC-2026-44104" }],
+        "name": [{ "text": "Farhan Qureshi" }],
+        "gender": "male",
+        "birthDate": "1997-01-19",
+        "telecom": [{ "system": "phone", "value": "+91-9765432109" }],
+        "address": [{ "line": ["12 Station Road"], "district": "Sitapur", "postalCode": "261001" }]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:11111111-2222-4333-8444-555555555552",
+      "resource": {
+        "resourceType": "Encounter",
+        "id": "enc-farhan-99",
+        "status": "finished",
+        "subject": {
+          "reference": "urn:uuid:11111111-2222-4333-8444-555555555551",
+          "display": "Farhan Qureshi"
+        },
+        "period": { "start": "2026-06-12", "end": "2026-06-16" }
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:11111111-2222-4333-8444-555555555553",
+      "resource": {
+        "resourceType": "Condition",
+        "id": "cond-farhan-99",
+        "subject": { "reference": "urn:uuid:11111111-2222-4333-8444-555555555551" },
+        "code": { "coding": [{ "system": "http://hl7.org/fhir/sid/icd-10", "code": "A09", "display": "Acute gastroenteritis" }] },
+        "recordedDate": "2026-06-12"
+      }
+    }
+  ]
+}

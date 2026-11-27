@@ -1,0 +1,320 @@
+/* ============================================================
+   Shared Components CSS
+   ============================================================ */
+
+/* ── Status chip ── */
+.status-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.22rem 0.65rem;
+  border-radius: 6px;
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  line-height: 1;
+}
+
+.status-chip.sanitized,
+.status-chip.completed {
+  background: var(--accent-teal-light);
+  color: var(--accent-teal-text);
+}
+
+.status-chip.quarantined {
+  background: var(--quarantine-light);
+  color: var(--quarantine-text);
+}
+
+.status-chip.failed,
+.status-chip.suppressed {
+  background: var(--error-light);
+  color: var(--error-text);
+}
+
+.status-chip.running {
+  background: #E2E8F0;
+  color: var(--text-secondary);
+}
+
+/* ── Pipeline Stages ── */
+.stages-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.65rem;
+}
+
+.stage-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.9rem 1.1rem;
+  border-radius: var(--radius-md);
+  border: 1.5px solid var(--border-subtle);
+  background: var(--bg-card);
+  transition: border-color var(--transition-fast), background var(--transition-fast);
+}
+
+.stage-item.is-active {
+  border-color: var(--accent-teal);
+  background: var(--accent-teal-xlight);
+}
+
+.stage-item.is-done {
+  border-color: #B2E5DE;
+  background: #FAFFFD;
+}
+
+.stage-badge {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 0.84rem;
+  flex-shrink: 0;
+  background: var(--bg-secondary);
+  color: var(--text-muted);
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.stage-item.is-active .stage-badge {
+  background: var(--accent-teal);
+  color: #FFFFFF;
+}
+
+.stage-item.is-done .stage-badge {
+  background: var(--accent-teal-light);
+  color: var(--accent-teal-text);
+}
+
+.stage-copy strong {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 0.925rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+
+.stage-copy small {
+  display: block;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  margin-top: 0.18rem;
+  line-height: 1.4;
+}
+
+/* ── Stat Card ── */
+.stat-card {
+  padding: 1.25rem 1.1rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-card);
+  box-shadow: var(--shadow-xs);
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.stat-card-value {
+  font-family: var(--font-mono);
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1;
+}
+
+.stat-card-label {
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.stat-card-sub {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+/* Coloured variants */
+.stat-card.teal  .stat-card-value { color: var(--accent-teal-text); }
+.stat-card.amber .stat-card-value { color: var(--accent-saffron-text); }
+.stat-card.error .stat-card-value { color: var(--error-text); }
+
+/* ── Before/After Comparison ── */
+.before-after {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.ba-pane {
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+  overflow: hidden;
+}
+
+.ba-pane-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0.9rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.ba-pane.ba-before .ba-pane-header {
+  background: var(--error-light);
+  color: var(--error-text);
+  border-bottom: 1px solid rgba(220, 38, 38, 0.15);
+}
+
+.ba-pane.ba-after .ba-pane-header {
+  background: var(--accent-teal-light);
+  color: var(--accent-teal-text);
+  border-bottom: 1px solid rgba(13, 148, 136, 0.15);
+}
+
+.ba-pane-body {
+  padding: 0.9rem;
+  background: var(--bg-code);
+  overflow-x: auto;
+}
+
+.ba-pane-body pre {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  line-height: 1.65;
+  color: var(--text-primary);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+@media (max-width: 640px) {
+  .before-after {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Linkage View ── */
+.linkage-groups {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.linkage-group {
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.linkage-group-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.65rem 1rem;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-subtle);
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.linkage-psn {
+  font-family: var(--font-mono);
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: #3730A3;
+  letter-spacing: 0.01em;
+}
+
+.linkage-count-pill {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.18rem 0.6rem;
+  border-radius: var(--radius-pill);
+  background: var(--accent-teal-light);
+  color: var(--accent-teal-text);
+}
+
+.linkage-records {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.linkage-record {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 1rem;
+  border-top: 1px solid var(--border-subtle);
+  font-size: 0.875rem;
+  flex-wrap: wrap;
+}
+
+.linkage-record:first-child {
+  border-top: 0;
+}
+
+.linkage-file {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  flex: 1;
+}
+
+.linkage-loc {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+/* ── Error Banner ── */
+.error-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.9rem;
+  padding: 0.9rem 1rem;
+  border-radius: var(--radius-md);
+  background: var(--error-light);
+  border: 1px solid rgba(220, 38, 38, 0.2);
+  color: var(--error-text);
+  font-size: 0.875rem;
+}
+
+.error-banner-icon {
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.error-banner-body {
+  flex: 1;
+}
+
+.error-banner-title {
+  font-weight: 700;
+  margin-bottom: 0.2rem;
+}
+
+.error-banner-reqid {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--error);
+  opacity: 0.75;
+  margin-top: 0.3rem;
+}
+
+.error-banner-actions {
+  margin-top: 0.5rem;
+  display: flex;
+  gap: 0.5rem;
+}

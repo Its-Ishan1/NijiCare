@@ -1,0 +1,133 @@
+/* ============================================================
+   Quarantine Page CSS
+   ============================================================ */
+
+.quarantine-layout {
+  display: grid;
+  gap: 1.25rem;
+}
+
+/* Empty state */
+.quarantine-empty {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.25rem;
+  padding: 2rem;
+}
+
+.qe-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--accent-teal-light);
+  display: grid;
+  place-items: center;
+  font-size: 1.5rem;
+  flex-shrink: 0;
+  color: var(--accent-teal);
+}
+
+.quarantine-empty strong {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  display: block;
+}
+
+.quarantine-empty p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-top: 0.4rem;
+  line-height: 1.6;
+}
+
+/* Quarantine table */
+.q-table-wrap {
+  overflow-x: auto;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+}
+
+.q-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.q-table thead tr {
+  background: var(--bg-secondary);
+}
+
+.q-table th {
+  padding: 0.65rem 1rem;
+  text-align: left;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border-subtle);
+  white-space: nowrap;
+}
+
+.q-table td {
+  padding: 0.65rem 1rem;
+  border-bottom: 1px solid var(--border-subtle);
+  vertical-align: middle;
+  color: var(--text-secondary);
+}
+
+.q-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.q-table tbody tr:hover td {
+  background: var(--bg-secondary);
+}
+
+.q-sha {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--text-primary);
+}
+
+/* Info section */
+.quarantine-info {
+  padding: 1.25rem 1.5rem;
+}
+
+.quarantine-info p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.65;
+}
+
+.q-reason-list {
+  list-style: none;
+  margin: 1rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.q-reason-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--radius-sm);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+}
+
+.q-reason-key {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  font-weight: 600;
+  flex-shrink: 0;
+  min-width: 200px;
+  color: var(--text-primary);
+}

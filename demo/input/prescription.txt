@@ -1,0 +1,7 @@
+Human-reviewed transcription of a synthetic prescription
+Patient Name: Kavi Ray   UHID: ALP-060101
+Date of Admission: 2026-08-21
+Date of Discharge: 2026-08-30
+Consultant: Dr. Kavi Ray
+C/O: fever
+Rx: Medicine A 5 mg

@@ -1,0 +1,103 @@
+/* ============================================================
+   Results Dashboard CSS
+   ============================================================ */
+
+.results-layout {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.results-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.results-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  flex-shrink: 0;
+}
+
+/* KPI stat grid */
+.results-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+}
+
+/* Resource/risk items */
+.results-risk-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.risk-item {
+  padding: 1rem 1.1rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-secondary);
+  display: grid;
+  gap: 0.3rem;
+}
+
+.risk-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.risk-value {
+  font-family: var(--font-mono);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+/* Residual risk callout */
+.results-risk-note {
+  margin-top: 0.9rem;
+  font-size: 0.875rem;
+  color: var(--accent-saffron-text);
+  line-height: 1.65;
+  padding: 0.85rem 1rem;
+  border-radius: var(--radius-md);
+  background: var(--accent-saffron-light);
+  border: 1px solid rgba(196, 132, 29, 0.25);
+}
+
+/* Inline text button */
+.inline-link {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  color: var(--accent-teal-text);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+  font-size: inherit;
+  font-family: inherit;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .results-kpi-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (max-width: 720px) {
+  .results-kpi-grid { grid-template-columns: repeat(2, 1fr); }
+  .results-risk-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 480px) {
+  .results-kpi-grid { grid-template-columns: 1fr 1fr; }
+}

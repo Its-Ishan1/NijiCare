@@ -1,0 +1,17 @@
+# Secrets and local configuration
+.env
+.env.local
+*.secret
+
+# Runtime outputs and caches
+output/
+out/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.DS_Store
+
+# Frontend dependencies/build cache
+demo-app/node_modules/
+demo-app/.env
+demo-app/server/output/

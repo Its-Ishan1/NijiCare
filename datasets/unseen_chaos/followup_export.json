@@ -1,0 +1,28 @@
+{
+  "hospital": "Nava Ward Clinic",
+  "exportedAt": "2026-06-20",
+  "visits": [
+    {
+      "visit_id": "OP-2026-77101",
+      "patient": {
+        "name": { "first": "Meera", "last": "Kulkarni", "local": "मीरा कुलकर्णी" },
+        "id": "NWC-2026-44103",
+        "dob": "1984-11-05",
+        "age_sex": "42 Y / F",
+        "phone": "9822334455",
+        "email": "meera.kulkarni.synth@example.test",
+        "pan": "ABCDE1234F",
+        "address": { "line": "House 14, Civil Lines", "district": "Barabanki", "pincode": "225001" }
+      },
+      "guardian": { "name": "Suresh Kulkarni" },
+      "consultant": "Dr. Ananya Rao",
+      "visit_date": "2026-06-22",
+      "vitals": { "bp": "124/80", "spo2": "98%", "temp_f": 98.4 },
+      "diagnosis": "Resolving community-acquired pneumonia",
+      "attachment": {
+        "contentType": "text/plain",
+        "data": "UGF0aWVudDogTWVlcmEgS3Vsa2FybmkgUGhvbmU6IDk4MjIzMzQ0NTU="
+      }
+    }
+  ]
+}

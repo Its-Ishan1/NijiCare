@@ -1,0 +1,194 @@
+/* ============================================================
+   File Viewer CSS
+   ============================================================ */
+
+.fileviewer-layout {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.fileviewer-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.fileviewer-body {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 1rem;
+  align-items: start;
+}
+
+/* Sidebar file list */
+.fv-sidebar {
+  position: sticky;
+  top: calc(var(--navbar-height, 80px) + 1.5rem);
+  display: grid;
+  gap: 0;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--bg-card);
+  overflow: hidden;
+  box-shadow: var(--shadow-xs);
+}
+
+.fv-sidebar-heading {
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  padding: 0.75rem 0.9rem 0.6rem;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.fv-file-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  width: 100%;
+  padding: 0.65rem 0.9rem;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--border-subtle);
+  text-align: left;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+
+.fv-file-btn:last-child {
+  border-bottom: 0;
+}
+
+.fv-file-btn:hover {
+  background: var(--bg-secondary);
+}
+
+.fv-file-btn.is-active {
+  background: var(--accent-teal-xlight);
+}
+
+.fv-file-name {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--text-primary);
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+.fv-file-btn.is-active .fv-file-name {
+  color: var(--accent-teal-text);
+}
+
+/* Main content */
+.fv-content {
+  display: grid;
+  gap: 1rem;
+}
+
+.fv-content-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.fv-content-title {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.fv-content-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+/* Text display pane */
+.fv-text-pane {
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--bg-code);
+}
+
+.fv-text-pane-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0.9rem;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-subtle);
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.fv-text-pane-body {
+  padding: 1rem;
+  overflow-x: auto;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.fv-text-pane-body pre {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  line-height: 1.65;
+  color: var(--text-primary);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* Before/after toggle */
+.fv-ba-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.25rem;
+}
+
+.fv-ba-label {
+  font-size: 0.84rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+/* Empty/placeholder states */
+.fv-empty {
+  text-align: center;
+  padding: 3rem 2rem;
+  color: var(--text-muted);
+}
+
+.fv-empty-icon {
+  font-size: 2.5rem;
+  margin-bottom: 0.75rem;
+  opacity: 0.5;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .fileviewer-body {
+    grid-template-columns: 1fr;
+  }
+
+  .fv-sidebar {
+    position: static;
+  }
+}
