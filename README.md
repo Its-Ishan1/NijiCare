@@ -2,14 +2,69 @@
 
 Secret Wards is an offline CPU pipeline for sanitizing synthetic Indian hospital records for research. It combines deterministic privacy rules with two trained statistical fallbacks: a multilingual linear-chain CRF for free-text names/addresses and a header-blind column-value classifier for unfamiliar CSV/TSV headers. The exported weights run with Python's standard library; no LLM, model download, network service, or third-party runtime package is used.
 
-## Run
+## Run the local website
+
+The instructor can clone the public repository and launch the offline web workbench on their own computer. Python 3.10+ is required; the built frontend is included, so Node.js and internet access are not required to run it.
+
+### macOS / Linux
+
+```bash
+git clone https://github.com/Its-Ishan1/NijiCare.git
+cd NijiCare
+chmod +x start-web.sh
+./start-web.sh
+```
+
+Open **http://127.0.0.1:8081**. The launcher uses a demo-only key if `RAKSHA_SECRET` is unset. Use synthetic data with that default; set a private key before launch for a different test run:
+
+```bash
+export RAKSHA_SECRET="$(python3 -c 'import secrets; print(secrets.token_hex(32))')"
+./start-web.sh
+```
+
+To use another port, run `PORT=8082 ./start-web.sh`. Keep the terminal open while testing and press **Ctrl+C** to stop the server. The adapter listens only on `127.0.0.1`; the page is local to that computer.
+
+### Windows
+
+```powershell
+git clone https://github.com/Its-Ishan1/NijiCare.git
+cd NijiCare\demo-app
+Set-ExecutionPolicy -Scope Process Bypass
+.\start.ps1
+```
+
+Open **http://127.0.0.1:8081**. The launcher uses the demo-only key unless `RAKSHA_SECRET` is set in the same PowerShell session.
+
+Choose individual files or a folder in the Workbench. Folder selection retains nested paths. Supported inputs are CSV, TSV, JSON, single-patient FHIR Bundles, and UTF text. Unsupported or unsafe inputs appear in Quarantine. The browser accepts up to 250 files and 25 MiB per run; use the CLI below for larger batches.
+
+## Run the command-line pipeline
+
+### macOS / Linux
+
+```bash
+git clone https://github.com/Its-Ishan1/NijiCare.git
+cd NijiCare
+export RAKSHA_SECRET="$(python3 -c 'import secrets; print(secrets.token_hex(32))')"
+python3 -B main.py --input /path/to/input --output /path/to/new-output
+```
+
+### Windows PowerShell
 
 ```powershell
 $env:RAKSHA_SECRET = 'use-a-secret-provided-out-of-band'
-python main.py --input path/to/input --output path/to/empty-output
+python -B main.py --input path\to\input --output path\to\new-output
 ```
 
 The input path may be a single file or a directory. The output directory must be empty or not exist. Keep `RAKSHA_SECRET` outside the repository and do not reuse a practice key for real systems. On POSIX, the CLI creates output files with owner-only permissions. It writes `sanitized/`, `records.jsonl`, and `report.json`. Runtime dependencies are all in the Python standard library.
+
+To run the regression suite and the organizer's output contract checker:
+
+```bash
+python3 -B -m unittest discover -s qa -v
+python3 /path/to/Secret-Wards-ToolKit/validate_output.py --input /path/to/input --output /path/to/new-output
+```
+
+The provided `a.json` test contains seven `Patient` resources in one FHIR Bundle. This release intentionally quarantines Bundles with more than one Patient as `unsupported_fhir_patient_count`; it does not emit partially sanitized data. Use a separate one-patient Bundle per file for the supported FHIR path.
 
 ## Design
 
@@ -62,6 +117,6 @@ An earlier run on the organiser's 200-file practice set reported linkage precisi
 
 ## Current verification
 
-The current 33-test regression suite passes. The attached multi-hospital fixture produced 17/17 linked records; the reviewed output had no patient names, phone numbers, or chart identifiers in release paths or metadata, and preserved checked clinical values and 9-day stays. The earlier 200-file practice metrics are documented separately in [the verification report](VALIDATION.md).
+The current 35-test regression suite passes. The comprehensive 24-file synthetic audit produced 20 sanitized files and quarantined 4 malformed or unsupported files; targeted checks confirmed six corroborated Meera records share one pseudonym, Rahul homonyms remain separate, ambiguous fragments abstain, and tested relative-name rules preserve clinical values. The earlier 200-file practice metrics are documented separately in [the verification report](VALIDATION.md).
 
 Known linkage ambiguity: records with different chart IDs but identical names, dates of birth and phone numbers may be linked as one patient. Those fields cannot prove whether the records are cross-hospital charts for one person or two people sharing the same contact details. Review such cases against trusted source data; the prototype currently favors cross-hospital linkage recall in this tie.

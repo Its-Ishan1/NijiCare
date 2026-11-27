@@ -6,6 +6,22 @@ This guide explains how to launch Secret Wards, feed **your own new data** as fi
 
 ## 1. Starting the Application
 
+### macOS / Linux
+From the repository root, run:
+
+```bash
+./start-web.sh
+```
+
+Open **http://127.0.0.1:8081**. The launcher runs the included frontend and Python adapter locally; it does not need Node.js or internet access. It uses a demo-only key when `RAKSHA_SECRET` is unset, so use synthetic data with that default. To set a private key first:
+
+```bash
+export RAKSHA_SECRET="$(python3 -c 'import secrets; print(secrets.token_hex(32))')"
+./start-web.sh
+```
+
+Use `PORT=8082 ./start-web.sh` to change ports. Keep the terminal open while the page is in use and press **Ctrl+C** to stop the server.
+
 ### Windows (One-Click Launcher)
 ```powershell
 cd demo-app
@@ -21,7 +37,7 @@ From the archive root, run `python -B demo-app/server/server.py` (use `python3` 
 
 ## 2. Supplying test data
 
-Choose **Choose files** for individual files or **Choose folder** for a directory. You can also drop files or a folder on the upload area. Subfolder paths are retained relative to the chosen folder. Supported formats are CSV, TSV, JSON and TXT. Other formats appear in the quarantine report.
+Choose **Choose files** for individual files or **Choose folder** for a directory. You can also drop files or a folder on the upload area. Subfolder paths are retained relative to the chosen folder. Supported formats are CSV, TSV, JSON, single-patient FHIR Bundles and TXT. Bundles with multiple Patient resources are quarantined as `unsupported_fhir_patient_count` rather than released with unsafe record mapping. Other formats appear in the quarantine report.
 
 Check the selected paths, then click **Run Privacy Pipeline**. For the same release key and policy, the web upload and CLI use the same source bytes. Use the CLI for batches above the browser limits of 250 files or 25 MiB of encoded request data.
 
