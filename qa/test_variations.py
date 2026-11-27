@@ -134,6 +134,41 @@ class ReleaseTests(unittest.TestCase):
         self.assertIn("Dolo 650 BD", note)
         self.assertNotIn("Mitra", str(records) + str(report) + (out / "index.json").read_text())
 
+    def test_filename_scrubbing_keyed_json_attachments_and_integer_age_banding(self):
+        self.write(
+            "register.csv",
+            "patient_name,patient_id,age,phone\nAarav Mehta,H-A-1001,27,9000000001\n",
+        )
+        self.write(
+            "Aarav_followup_bundle.json",
+            json.dumps({
+                "Aarav_Mehta": {
+                    "hospital_patient_id": "H-A-1001",
+                    "contact": {"phone": "9000000001"},
+                    "age": 27,
+                }
+            }),
+        )
+        self.write(
+            "aarav_mehta_discharge_note.txt",
+            "Discharge note for Aarav Mehta. Phone: 9000000001. Follow-up advised.\n",
+        )
+        out, records, report = self.release()
+        by_file = {}
+        for record in records:
+            by_file.setdefault(Path(record["file"]).name, []).append(record["patient"])
+        outputs = [entry["output"] for entry in report["files"] if entry["output"]]
+        self.assertFalse(any("Aarav" in path or "aarav" in path for path in outputs))
+        self.assertTrue(all("Aarav" not in str(record) for record in records))
+        self.assertEqual(len(records), 3)
+        self.assertEqual(len({record["patient"] for record in records}), 1)
+        self.assertNotIn("Aarav", (out.parent / "report.json").read_text(encoding="utf-8"))
+        json_path = next(out.rglob("*.json"))
+        sanitized = json.loads(json_path.read_text(encoding="utf-8"))
+        keyed_record = next(iter(sanitized.values()))
+        self.assertEqual(keyed_record["age"], "25-29")
+        self.assertIn("PSN-", keyed_record["hospital_patient_id"])
+
     def test_unsafe_rows_and_invalid_json(self):
         self.write("bad.csv", "Name,UHID,Dose\nunexpected,extra,Someone Private,XR-12345,5 mg\n")
         self.write("dupe.json", '{"name":"one","name":"two"}')

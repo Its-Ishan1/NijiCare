@@ -48,9 +48,9 @@ The output folder contains `sanitized/`, `records.jsonl`, and `report.json`. The
 
 ## Privacy and utility evidence
 
-The corrected model was checked on the organizer's 200-file practice set: 0/3,230 labeled identifiers visible, 0/4 canaries, and 4,855/4,855 clinical probes retained. Linkage precision/recall/F0.5 measured 1.00/0.96/0.99, with zero false merges. It produced 193 sanitized files and seven quarantines. A regression now preserves the clinical shorthand `K/C/O` (“known case of”) while continuing to redact relative names in genuine `C/O` contexts. These are results on the supplied synthetic practice set, not a guarantee for unseen records.
+The attached 14-file synthetic multi-hospital fixture produced 11 sanitized files and three quarantines (two unsupported formats and one malformed JSON). All 17 emitted records received a patient pseudonym, including text attachments and patient-keyed JSON. Aarav and Sana linked consistently across hospitals and scripts; Kiran's unmatched note received a stable chartless pseudonym. Filenames and JSON keys containing names were neutralized. The test preserved clinical values and the 9-day stay interval; integer JSON ages 27 and 42 became `25-29` and `40-44`. These results describe this small fixture, not a guarantee for unseen records.
 
-That baseline had 2/39 covered records unique on age-band plus district, but 15/15 unique on a four-field FHIR subset that added shifted admission week and diagnosis. This is a residual-risk warning, not a privacy pass. The risk script measures simple uniqueness and is not the competition attack arena. Numeric JSON ages retain their exact values. Date shifts preserve intervals; age bands trade detail for lower demographic precision.
+Age bands trade detail for lower demographic precision. JSON age values are emitted as string ranges because a numeric integer cannot represent an interval; the range contains the observed age. Date shifts preserve stay lengths and event intervals. The current risk tooling measures simple uniqueness and is not a substitute for the competition's re-identification attack evaluation.
 
 ## Security design and limitations
 

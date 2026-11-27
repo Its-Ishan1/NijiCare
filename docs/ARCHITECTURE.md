@@ -129,7 +129,7 @@ Rigid age grids either over-coarsen dense cohorts or leave rare district/age tai
 1. Partition observed `(patient_root, age)` pairs in each district into base bins of width `age_band_years` (default `5`).
 2. Merge adjacent bins that share the same longitudinal multi-visit patient (up to `age_band_max_years`, default `50`).
 3. Greedily merge any bin with fewer than `age_k_anonymity` (default `2`) distinct patients with its narrowest valid neighbor (preferring merging two sparse bins or minimal span increase), stopping when all bins satisfy $k$ or further merging would exceed `age_band_max_years`.
-4. Propagate each linked patient's resolved band consistently across CSV/TSV cells, JSON string `age_sex` fields, and labeled/inline free-text note ages (`Age/Sex:`, `आयु:`, `48 Y / F`).
+4. Propagate each linked patient's resolved band consistently across CSV/TSV cells, JSON string and integer age fields, and labeled/inline free-text note ages (`Age/Sex:`, `आयु:`, `48 Y / F`). JSON age ranges are strings (for example, `25-29`) because an integer cannot represent an interval.
 
 ### 3.5 FHIR R4 Bundle Sanitization (`process_fhir`)
 - Validates single-patient Bundle structure (`unsupported_fhir_patient_count` if $\neq 1$).

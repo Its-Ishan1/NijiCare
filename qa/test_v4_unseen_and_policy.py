@@ -61,7 +61,9 @@ class V4PolicyAndUnseenTests(unittest.TestCase):
 
             # JSON followup linked to row 2; FHIR Bundle linked to row 3
             self.assertEqual(by_file_loc[("sanitized/followup_export.json", "/visits/0")], csv_row2)
-            self.assertEqual(by_file_loc[("sanitized/fhir_farhan_bundle.json", "doc")], csv_row3)
+            fhir_record = next(r for r in records if r["loc"] == "doc" and r["file"].endswith(".json"))
+            self.assertEqual(fhir_record["patient"], csv_row3)
+            self.assertNotIn("Farhan", fhir_record["file"])
 
             # Verify no raw PII leaked in sanitized Hindi note, while doctor & clinical values survived
             note_text = (out / txt_entries[0]["file"]).read_text(encoding="utf-8")

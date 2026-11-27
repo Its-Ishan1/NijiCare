@@ -108,7 +108,7 @@ class SeededExports(unittest.TestCase):
         obj = json.loads((out/"transfer.json").read_bytes())
         self.assertNotIn("Indu", json.dumps(obj))
         self.assertEqual(obj["catalog"], data["catalog"])
-        self.assertEqual(type(obj["visits"][0]["age"]), int)
+        self.assertEqual(obj["visits"][0]["age"], "35-39")
         pids = [linked["transfer.json", f"/visits/{i}"] for i in range(3)]
         self.assertTrue(pids[0])
         self.assertEqual(len(set(pids)), 1)

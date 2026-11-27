@@ -314,6 +314,17 @@ ATTACHMENT_FIELDS = {"data", "content", "payload"}
 PERSON_WORD = r"[A-ZÀ-ÖØ-Þ][^\W\d_]*(?:[.'’-][^\W\d_]+)*"
 PERSON_NAME = rf"{PERSON_WORD}(?:[ \t]+{PERSON_WORD}){{1,4}}"
 PERSON_FRAGMENT = rf"{PERSON_WORD}(?:[ \t]+{PERSON_WORD}){{0,4}}"
+_TEXT_PERSON_WORD = rf"(?:{PERSON_WORD}|[\u0900-\u097f]+)"
+_TEXT_PERSON_NAME = rf"{_TEXT_PERSON_WORD}(?:[ \t]+{_TEXT_PERSON_WORD}){{1,3}}"
+TEXT_NOTE_SUBJECT = re.compile(
+    rf"(?i)\b(?:discharge|follow[ -]?up|patient|clinical)?[ \t]*(?:note|summary|report)"
+    rf"[ \t]+(?:for|of)[ \t]+(?P<name>{_TEXT_PERSON_NAME})(?=$|[,.\r\n])"
+)
+TEXT_LEADING_CONTACT = re.compile(
+    rf"(?im)^[ \t]*(?P<name>{_TEXT_PERSON_NAME})"
+    rf"(?:[ \t]*\((?P<alias>{_TEXT_PERSON_NAME})\))?[ \t]*,?[ \t]*"
+    rf"(?:mobile|phone)\b"
+)
 FRAGMENTED_RELATION = re.compile(
     rf"(?i)(?<![\w])(?P<patient>{PERSON_FRAGMENT})[ \t]*,[ \t]*"
     rf"(?P<relation>[sdw]/o)[ \t]+(?P<relative>{PERSON_FRAGMENT})"
@@ -363,7 +374,7 @@ CONTEXT_PATTERNS = (CONTACT_NAME, VISITOR_NAME, RELATIVE_NAME, CHAT_SENDER, HONO
 FIELD_LABELS = {
     "NAME": "patient name|patient's name|patient full name|full patient name|name of patient|patient legal name|first name|last name|given name|family name|surname|patient|naam|naame|naem|नाम|मरीज़ का नाम|मरीज का नाम|रोगी का नाम|client name|subject name|beneficiary name",
     "RELATIVE": "relative name|guardian|guardian name|attendant|attendant name|next of kin|nok|care of|father name|mother name|spouse name|husband name|pita/pati ka naam|पिता का नाम|पति का नाम|अभिभावक",
-    "MRN": "patient id|patient ref|mrn|uhid|uhid no|hospital uhid|registration no|reg no|chart id|chart number|medical record number|medical record id|hospital number|registration number|patient identifier|hospital id|case no|case id|file no|पंजीकरण सं.|पंजीकरण संख्या|पंजीकरण नंबर|पंजीयन संख्या",
+    "MRN": "patient id|patient ref|mrn|uhid|uhid no|hospital uhid|registration no|reg no|chart id|chart number|medical record number|medical record id|record id|record identifier|local id|hospital number|registration number|patient identifier|hospital id|case no|case id|file no|पंजीकरण सं.|पंजीकरण संख्या|पंजीकरण नंबर|पंजीयन संख्या",
     "ENCOUNTER": "ipd no|opd no|ip no|op no|admission id|encounter id|visit id|आईपीडी सं.",
     "PHONE": "phone|phone no|phone number|telephone|tel|contact|contact no|contact number|callback|mobile|mobile number|mobile no|mob|cell|whatsapp|मोबाइल|मोबाइल नं.|फ़ोन|फोन",
     "EMAIL": "email|email address|e-mail|mail|abha address",
@@ -656,6 +667,7 @@ class ReleaseVocabulary:
         self.trie = {}
         self.chart_ids = set()
         self.given_names = set()
+        self.name_tokens = set()
         self.relative_names = set()
 
     def add_relative(self, name):
@@ -670,6 +682,7 @@ class ReleaseVocabulary:
         if not 2 <= len(words) <= 6 or len(name) > 96 or any(c.isdigit() for c in name):
             return
         self.given_names.add(words[0])
+        self.name_tokens.update(words)
         for sequence in (words, list(reversed(words))):
             node = self.trie
             for word in sequence:
@@ -1030,9 +1043,18 @@ def sensitive_label(label: str) -> bool:
     return bool(ID_TOKEN.search(probe.upper())) or clean_text(label) != label
 
 
+def sensitive_filename(label: str) -> bool:
+    if sensitive_label(label):
+        return True
+    tokens = {match[0].casefold() for match in WORDS.finditer(readable(label))}
+    # A single patient-name token in a filename can identify a record. Requiring
+    # a complete name misses names followed by words such as "followup".
+    return bool(HASH_FILENAMES_ENABLED and tokens & VOCAB.name_tokens)
+
+
 def release_path(relative: Path) -> str:
-    folders = [private_label(part) if sensitive_label(part) else part for part in relative.parts[:-1]]
-    name = private_label(relative.stem) + relative.suffix if sensitive_label(relative.stem) else relative.name
+    folders = [private_label(part) if sensitive_filename(part) else part for part in relative.parts[:-1]]
+    name = private_label(relative.stem) + relative.suffix if sensitive_filename(relative.stem) else relative.name
     return "/".join([*folders, name])
 
 
@@ -1084,6 +1106,12 @@ def clean_value(value, kind=None, *, context="", date_key=None, records_by_id=No
     if kind and _category_enabled(kind) and type(value) in (str, int, float) and value != "":
         Stats.record_entity(kind)
         return f"[{kind}]" if isinstance(value, str) else type(value)(0)
+    if dynamic_is_age_label(context) and type(value) in (str, int) and GENERALIZE_AGES_ENABLED:
+        match = AGE_VALUE.fullmatch(str(value))
+        if match:
+            age = int(ascii_digits(match[1]))
+            if 0 <= age <= 125:
+                return index.age_interval(age, patient_key, areas) if index else age_band(age)
     if not isinstance(value, str):
         return value
     if PRESERVE_DOCTORS_ENABLED and context in DOCTOR_CONTEXTS:
@@ -1099,7 +1127,7 @@ def clean_value(value, kind=None, *, context="", date_key=None, records_by_id=No
 
 
 # --------------------------------------------------------------------------- linkage
-IDENTITY_CONTEXT = {"patient", "patientref", "contact", "ids", "demographics", "identifiers"}
+IDENTITY_CONTEXT = {"patient", "patientref", "patientdetails", "contact", "ids", "demographics", "identifiers"}
 IDENTITY_KINDS = {"MRN", "ENCOUNTER", "NAME", "RELATIVE", "PHONE", "DOB", "NATIONAL_ID", "EMAIL", "ADDRESS"}
 VILLAGE_LABELS = {field_label(k) for k in ("village", "gaon", "ग्राम", "village/mohalla", "gram/mohalla")}
 CALLBACK = re.compile(r"(?i)\b(?:call(?:\s+(?:karo|back|at|on))?|mobile|phone)\s*[:=-]?\s*"
@@ -1109,7 +1137,7 @@ REPORT_SUBJECT = re.compile(r"(?i)\breport\s+(?:of|for)\s+([^\W\d_]+)")
 
 def identity_id(value: str) -> str | None:
     token = re.sub(r"[\s_./-]", "", ascii_digits(value)).upper()
-    if re.fullmatch(r"[A-Z][A-Z0-9]{4,47}", token) and sum(c.isdigit() for c in token) >= 2:
+    if re.fullmatch(r"[A-Z][A-Z0-9]{3,47}", token) and sum(c.isdigit() for c in token) >= 2:
         return token
     return None
 
@@ -1176,6 +1204,11 @@ def evidence(record, month_first=False):
         fields["PHONE"].update(re.sub(r"\D", "", ascii_digits(m["number"]))[-10:]
                                for m in CALLBACK.finditer(record))
         fields["GIVEN"].update(canonical_person_name(m[1]) for m in REPORT_SUBJECT.finditer(record))
+        for pattern in (TEXT_NOTE_SUBJECT, TEXT_LEADING_CONTACT):
+            for match in pattern.finditer(record):
+                fields["NAME"].add(match["name"].strip())
+                if match.groupdict().get("alias"):
+                    fields["NAME"].add(match["alias"].strip())
     context = "patients" if isinstance(record, dict) and patient_record(record) else ""
     for label, kind, value in identity_fields(record, context=context):
         value = readable(value)
@@ -1427,6 +1460,14 @@ class IdentityIndex:
                     candidates.add(token)
                 candidates.update(self.encounters.get(token, ()))
         roots = {self.root(mrn) for mrn in candidates if mrn in self.roots}
+        if not roots and not candidates and len(fields["NAME"]) == 1 and len(fields["PHONE"]) == 1:
+            # A name+phone pair can identify a chartless note. When that pair
+            # maps to conflicting charts above, this conservative fallback is
+            # skipped rather than inventing a link.
+            name = canonical_person_name(next(iter(fields["NAME"])))
+            phone = next(iter(fields["PHONE"]))
+            if len(name.split()) >= 2:
+                return f"chartless|{name}|{phone}"
         if len(roots) != 1:
             return None
         key = next(iter(roots))
@@ -1540,15 +1581,32 @@ def patient_record(value):
                 or "name" in labels and kinds & {"DOB", "PHONE", "EMAIL"})
 
 
+def json_person_key(value):
+    if not isinstance(value, str):
+        return None
+    candidate = re.sub(r"[_-]+", " ", value).strip()
+    words = [match[0] for match in WORDS.finditer(candidate)]
+    return candidate if 2 <= len(words) <= 5 and " ".join(words).casefold() == candidate.casefold() else None
+
+
 def json_records(data, path=()):
     if isinstance(data, list):
         for index, item in enumerate(data):
             yield from json_records(item, (*path, index))
     elif isinstance(data, dict):
         if patient_record(data):
-            yield path, data
+            yield path, data, None
             return
         for key, item in data.items():
+            if isinstance(item, dict) and (name_hint := json_person_key(key)):
+                keyed = dict(item)
+                keyed["Patient Name"] = name_hint
+                keyed_fields = evidence(keyed)
+                if keyed_fields["NAME"] and any(
+                    keyed_fields[kind] for kind in ("MRN", "DOB", "PHONE", "NATIONAL_ID")
+                ):
+                    yield (*path, key), item, name_hint
+                    continue
             if isinstance(item, (list, dict)):
                 yield from json_records(item, (*path, key))
 
@@ -1780,8 +1838,11 @@ def record_fields(data, ext, month_first):
     elif is_bundle(data):
         yield bundle_evidence(data)
     elif ext == ".json":
-        for _, row in json_records(data):
-            yield evidence(row)
+        for _, row, name_hint in json_records(data):
+            fields = evidence(row)
+            if name_hint:
+                fields["NAME"].add(name_hint)
+            yield fields
     else:
         yield evidence(data, month_first)
 
@@ -1789,6 +1850,15 @@ def record_fields(data, ext, month_first):
 def add_record(records, rel, loc, pid, generalized=False):
     records.append({"file": f"sanitized/{rel}", "loc": loc, "patient": pid})
     Stats.generalized += generalized
+
+
+def safe_json_locator(path):
+    parts = []
+    for part in path:
+        if isinstance(part, str) and sensitive_label(part):
+            part = private_label(part)
+        parts.append(str(part).replace("~", "~0").replace("/", "~1"))
+    return "".join("/" + part for part in parts) or "doc"
 
 
 def process_csv(rows, delimiter: str, rel: str, records: list, index, month_first) -> str:
@@ -1848,8 +1918,10 @@ def insert_pseudonym(cleaned, pid):
     return False
 
 
-def clean_json_record(data, rel, loc, records, index):
+def clean_json_record(data, rel, loc, records, index, name_hint=None):
     fields = evidence(data)
+    if name_hint:
+        fields["NAME"].add(name_hint)
     key = index.resolve(data, fields)
     cleaned = clean_value(
         data,
@@ -1862,17 +1934,25 @@ def clean_json_record(data, rel, loc, records, index):
     pid = pseudonym(key) if key and isinstance(cleaned, dict) else None
     if pid and not insert_pseudonym(cleaned, pid):
         pid = None
-    add_record(records, rel, loc, pid, has_json_date(data))
+    add_record(records, rel, loc, pid, has_json_generalization(data))
     return cleaned
 
 
-def has_json_date(data):
+def has_json_generalization(data):
+    if isinstance(data, list):
+        return any(has_json_generalization(item) for item in data)
     if not isinstance(data, dict):
         return False
-    return any(
-        is_date_label(field_label(label)) and isinstance(value, str) and DATE_TOKEN.search(value)
-        for label, value in data.items()
-    )
+    for label, value in data.items():
+        if is_date_label(field_label(label)) and isinstance(value, str) and DATE_TOKEN.search(value):
+            return True
+        if dynamic_is_age_label(label) and type(value) in (int, str):
+            match = AGE_VALUE.fullmatch(str(value))
+            if match and 0 <= int(ascii_digits(match[1])) <= 125 and GENERALIZE_AGES_ENABLED:
+                return True
+        if has_json_generalization(value):
+            return True
+    return False
 
 
 def clean_fhir_value(value, refs, fields, date_key, pid, patient_refs):
@@ -1978,11 +2058,9 @@ def process_json(data, rel: str, records: list, index) -> str:
         cleaned = process_fhir(data, rel, records, index)
     else:
         replacements = {}
-        for path, row in json_records(data):
-            if any(sensitive_label(k) for k in path if isinstance(k, str)):
-                continue  # The locator itself would expose a private key.
-            loc = "".join("/" + str(part).replace("~", "~0").replace("/", "~1") for part in path) or "doc"
-            replacements[id(row)] = clean_json_record(row, rel, loc, records, index)
+        for path, row, name_hint in json_records(data):
+            loc = safe_json_locator(path)
+            replacements[id(row)] = clean_json_record(row, rel, loc, records, index, name_hint)
         cleaned = clean_value(data, records_by_id=replacements)
     return json.dumps(cleaned, ensure_ascii=False, indent=2) + "\n"
 
