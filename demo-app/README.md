@@ -18,6 +18,8 @@ python3 -B server/server.py
 
 Open **http://127.0.0.1:8081**. The root launcher uses a demo-only key if `RAKSHA_SECRET` is unset, and warns to use synthetic data with that key. Set `RAKSHA_SECRET` before launch to use a private test key. Set `PORT=8082` to select another local port.
 
+`127.0.0.1` always means the computer opening the browser; it is not a public hosted URL. If you see an older site, stop an older server, run `git pull origin main`, restart the launcher and hard-refresh the browser (**Cmd+Shift+R** on macOS, **Ctrl+F5** on Windows/Linux). The launcher reports an occupied port and shows how to use another one.
+
 ## Start on Windows PowerShell
 
 From this directory:

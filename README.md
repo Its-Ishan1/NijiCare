@@ -15,7 +15,7 @@ chmod +x start-web.sh
 ./start-web.sh
 ```
 
-Open **http://127.0.0.1:8081**. The launcher uses a demo-only key if `RAKSHA_SECRET` is unset. Use synthetic data with that default; set a private key before launch for a different test run:
+Open **http://127.0.0.1:8081** on the same computer. This is a local address, not a hosted website: it opens the server started from the clone on that laptop. The launcher uses a demo-only key if `RAKSHA_SECRET` is unset. Use synthetic data with that default; set a private key before launch for a different test run:
 
 ```bash
 export RAKSHA_SECRET="$(python3 -c 'import secrets; print(secrets.token_hex(32))')"
@@ -23,6 +23,8 @@ export RAKSHA_SECRET="$(python3 -c 'import secrets; print(secrets.token_hex(32))
 ```
 
 To use another port, run `PORT=8082 ./start-web.sh`. Keep the terminal open while testing and press **Ctrl+C** to stop the server. The adapter listens only on `127.0.0.1`; the page is local to that computer.
+
+If an old page still appears, stop any server already running on port 8081, update the clone with `git pull origin main`, start the launcher again, then hard-refresh the browser (**Cmd+Shift+R** on macOS, **Ctrl+F5** on Windows/Linux). The launcher refuses to start on an occupied port and prints instructions instead of leaving you connected to an older server.
 
 ### Windows
 

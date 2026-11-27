@@ -22,6 +22,8 @@ export RAKSHA_SECRET="$(python3 -c 'import secrets; print(secrets.token_hex(32))
 
 Use `PORT=8082 ./start-web.sh` to change ports. Keep the terminal open while the page is in use and press **Ctrl+C** to stop the server.
 
+This address is local to the machine where the server is running, not a hosted link. If an older page appears, update the clone (`git pull origin main`), stop the previous server, restart the launcher, and hard-refresh the browser. The launcher refuses to start on an occupied port; use a free port such as `PORT=8082 ./start-web.sh` if necessary.
+
 ### Windows (One-Click Launcher)
 ```powershell
 cd demo-app
